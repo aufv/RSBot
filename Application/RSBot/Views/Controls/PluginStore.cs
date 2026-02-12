@@ -19,6 +19,22 @@ namespace RSBot.Views.Controls
         public PluginStore()
         {
             InitializeComponent();
+            flowPanelWeb.Resize += (_, _) => ResizePluginCards();
+        }
+
+        private int GetCardWidth()
+        {
+            return Math.Max(640, flowPanelWeb.ClientSize.Width - flowPanelWeb.Padding.Horizontal - 4);
+        }
+
+        private void ResizePluginCards()
+        {
+            var cardWidth = GetCardWidth();
+            foreach (Control control in flowPanelWeb.Controls)
+            {
+                if (control is PluginCard card)
+                    card.Width = cardWidth;
+            }
         }
 
         private static string FormatBytes(long bytes)
@@ -114,6 +130,8 @@ namespace RSBot.Views.Controls
                         {
                             PluginInfo = pluginInfo,
                             Dock = DockStyle.Top,
+                            Width = GetCardWidth(),
+                            Margin = new Padding(0),
                         };
 
                         card.DownloadClicked += async (s, e) => await DownloadPlugin(pluginInfo);
@@ -126,7 +144,7 @@ namespace RSBot.Views.Controls
                     {
                         foreach (var cardItem in cards)
                         {
-                            flowPanelWeb.Controls.Add(new System.Windows.Forms.Panel() { Height = 10, Dock = DockStyle.Top });
+                            flowPanelWeb.Controls.Add(new System.Windows.Forms.Panel { Height = 10, Dock = DockStyle.Top });
                             flowPanelWeb.Controls.Add(cardItem);
                         }
                     }
@@ -147,6 +165,7 @@ namespace RSBot.Views.Controls
             {
                 // ⭐ Resume layout
                 flowPanelWeb.ResumeLayout(true);
+                ResizePluginCards();
             }
         }
 
