@@ -20,6 +20,8 @@ public partial class PluginCard : SDUI.Controls.Panel
     public PluginCard()
     {
         InitializeComponent();
+        Resize += (_, _) => UpdateLayoutForCurrentSize();
+        UpdateLayoutForCurrentSize();
 
         Click += (s, e) => CardClicked?.Invoke(this, e);
     }
@@ -121,8 +123,54 @@ public partial class PluginCard : SDUI.Controls.Panel
         }
         finally
         {
+            UpdateLayoutForCurrentSize();
             ResumeLayout(true); // Perform layout once
             Refresh(); // Single refresh
+        }
+    }
+
+    private void UpdateLayoutForCurrentSize()
+    {
+        var contentLeft = 15;
+        var contentTop = 12;
+        var actionButtonWidth = 95;
+        var actionButtonRightPadding = 15;
+        var minTextWidth = 220;
+        var metaWidth = 120;
+
+        var rightActionsX = Math.Max(contentLeft + minTextWidth, Width - actionButtonWidth - actionButtonRightPadding);
+        var textRightPadding = 12;
+        var textWidth = Math.Max(minTextWidth, rightActionsX - contentLeft - textRightPadding);
+
+        lblPluginName.Location = new Point(contentLeft, contentTop);
+        lblPluginName.AutoSize = false;
+        lblPluginName.Size = new Size(textWidth, 24);
+
+        lblDescription.Location = new Point(contentLeft, 70);
+        lblDescription.Size = new Size(textWidth, 40);
+
+        lblVersion.Location = new Point(contentLeft, 42);
+        lblVersion.AutoSize = false;
+        lblVersion.Size = new Size(metaWidth, 20);
+
+        lblAuthor.Location = new Point(contentLeft, 115);
+        lblAuthor.AutoSize = false;
+        lblAuthor.Size = new Size(textWidth, 20);
+
+        btnToggle.Location = new Point(rightActionsX, 108);
+        btnDownload.Location = btnToggle.Location;
+        buttonToggleLoad.Location = new Point(rightActionsX, 73);
+
+        if (lblRating.Visible)
+        {
+            lblRating.AutoSize = true;
+            lblRating.Location = new Point(Math.Max(contentLeft, rightActionsX - lblRating.PreferredWidth - 6), 8);
+        }
+
+        if (lblCategory.Visible)
+        {
+            lblCategory.AutoSize = true;
+            lblCategory.Location = new Point(Math.Max(contentLeft, rightActionsX - lblCategory.PreferredWidth - 6), 34);
         }
     }
 

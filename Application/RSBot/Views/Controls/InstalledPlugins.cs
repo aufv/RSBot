@@ -19,8 +19,24 @@ namespace RSBot.Views.Controls
         public InstalledPlugins()
         {
             InitializeComponent();
+            flowPanelLocal.Resize += (_, _) => ResizePluginCards();
 
             EventManager.SubscribeEvent("OnPluginListChanged", LoadLocalPlugins);
+        }
+
+        private int GetCardWidth()
+        {
+            return Math.Max(640, flowPanelLocal.ClientSize.Width - flowPanelLocal.Padding.Horizontal - 4);
+        }
+
+        private void ResizePluginCards()
+        {
+            var cardWidth = GetCardWidth();
+            foreach (Control control in flowPanelLocal.Controls)
+            {
+                if (control is PluginCard card)
+                    card.Width = cardWidth;
+            }
         }
 
         internal void LoadLocalPlugins()
@@ -47,7 +63,9 @@ namespace RSBot.Views.Controls
                     var card = new PluginCard
                     {
                         Plugin = plugin,
-                        Dock = DockStyle.Top
+                        Dock = DockStyle.Top,
+                        Width = GetCardWidth(),
+                        Margin = new Padding(0),
                     };
 
                     card.ToggleClicked += (s, e) =>
@@ -68,7 +86,7 @@ namespace RSBot.Views.Controls
                 {
                     foreach (var cardItem in cards)
                     {
-                        flowPanelLocal.Controls.Add(new System.Windows.Forms.Panel() { Height = 10, Dock = DockStyle.Top });
+                        flowPanelLocal.Controls.Add(new System.Windows.Forms.Panel { Height = 10, Dock = DockStyle.Top });
                         flowPanelLocal.Controls.Add(cardItem);
                     }
                 }
@@ -80,6 +98,7 @@ namespace RSBot.Views.Controls
             {
                 // ⭐ Resume layout and perform single layout operation
                 flowPanelLocal.ResumeLayout(true);
+                ResizePluginCards();
             }
         }
 
